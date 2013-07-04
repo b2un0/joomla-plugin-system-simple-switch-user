@@ -20,26 +20,27 @@ class plgSystemSimple_Switch_User extends JPlugin {
 		$id 	= $app->input->get('id', 0, 'int');
 		
 		if ($app->isAdmin() && $option == 'com_users' && $view == 'user' && $layout == 'edit') {
-        
-            $js = '<script type="text/javascript">
-            Joomla.submitbuttonOld = Joomla.submitbutton;
-            Joomla.submitbutton = function(task) {
-                if(task == "switchuser") {
-                    window.open("'.JURI::root().'index.php?su=1&uid='.$id.'");
-                    return false;
-                }else{
-                    Joomla.submitbuttonOld(task);
-                }
-            }</script>';
-            
-            $content = $doc->getBuffer('component');
-            $content = $content . $js;
-            $doc->setBuffer($content, 'component');
-            
-            JToolBarHelper::divider();
-            JToolBarHelper::custom('switchuser', 'upload', 'upload', 'Switch to User', false);
+
+			$js = '<script type="text/javascript">
+			Joomla.submitbuttonOld = Joomla.submitbutton;
+			Joomla.submitbutton = function(task) {
+			if(task == "switchuser") {
+			window.open("'.JURI::root().'index.php?su=1&uid='.$id.'");
+			return false;
+			}else{
+			Joomla.submitbuttonOld(task);
+			}
+			}</script>';
+
+			$content = $doc->getBuffer('component');
+			$content = $content . $js;
+			$doc->setBuffer($content, 'component');
+
+			JToolBarHelper::divider();
+			JToolBarHelper::custom('switchuser', 'upload', 'upload', 'Switch to User', false);
 		}
 	}
+    
     
 	function onAfterInitialise() {
 		$app	= JFactory::getApplication();
