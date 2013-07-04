@@ -25,7 +25,7 @@ class plgSystemSimple_Switch_User extends JPlugin {
             Joomla.submitbuttonOld = Joomla.submitbutton;
             Joomla.submitbutton = function(task) {
                 if(task == "switchuser") {
-                    window.open("'.JURI::root().'index.php?switchuser=1&uid='.$id.'");
+                    window.open("'.JURI::root().'index.php?su=1&uid='.$id.'");
                     return false;
                 }else{
                     Joomla.submitbuttonOld(task);
@@ -47,16 +47,16 @@ class plgSystemSimple_Switch_User extends JPlugin {
 		$user	= JFactory::getUser();
 		$userId = $app->input->get('uid', 0, 'int');
 		
-		if ($app->isAdmin() || !$app->input->get('switchuser', false, 'bool') || !$userId) {
+		if ($app->isAdmin() || !$app->input->get('su', 0, 'int') || !$userId) {
 			return;
 		}
 		
 		if ($user->id == $userId) {
-			return $app->redirect('index.php', JText::_('You have already login as the user'), 'warning');
+			return $app->redirect('index.php', JText::sprintf('You already logged in as user &quot;%s&quot;', $user->name), 'warning');
 		}
 		
 		if ($user->id) {
-			return $app->redirect('index.php', JText::_('You have login as another user, please logout first'), 'warning');
+			return $app->redirect('index.php', JText::_('You would login as another user, please logout first'), 'warning');
 		}
 		
 		$query = $db->getQuery(true)
@@ -91,7 +91,6 @@ class plgSystemSimple_Switch_User extends JPlugin {
 		$session = JFactory::getSession();
 		$session->set('user', $instance);
 
-		$app = JFactory::getApplication();
 		$app->checkSession();
 
 		$query = $db->getQuery(true)
@@ -103,6 +102,6 @@ class plgSystemSimple_Switch_User extends JPlugin {
 		$db->setQuery($query);
 		$db->execute();
 		
-		$app->redirect('index.php', JText::_('You have login successfully'));
+		$app->redirect('index.php', JText::sprintf('You have login successfully as user &quot;%s&quot;', $instance->name));
 	}
 }
