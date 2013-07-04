@@ -86,8 +86,6 @@ class plgSystemSimple_Switch_User extends JPlugin {
 
 		$instance->set('guest', 0);
 
-		$instance->set('usertype', $grp->name);
-		
 		$session = JFactory::getSession();
 		$session->set('user', $instance);
 
