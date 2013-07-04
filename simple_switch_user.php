@@ -46,7 +46,7 @@ class plgSystemSimple_Switch_User extends JPlugin {
 		$app	= JFactory::getApplication();
 		$db		= JFactory::getDbo();
 		$user	= JFactory::getUser();
-		$userId = $app->input->get('uid', 0, 'int');
+		$userId	= $app->input->get('uid', 0, 'int');
 		
 		if ($app->isAdmin() || !$app->input->get('su', 0, 'int') || !$userId) {
 			return;
