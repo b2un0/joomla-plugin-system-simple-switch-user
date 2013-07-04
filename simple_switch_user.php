@@ -13,11 +13,12 @@ class plgSystemSimple_Switch_User extends JPlugin {
     
 	function onBeforeRender() {
 		$app 	= JFactory::getApplication();
-		$option = JRequest::getCmd('option');
-		$view 	= JRequest::getCmd('view');
-		$layout = JRequest::getCmd('layout');
-		$id 	= JRequest::getCmd('id');
-        
+		$doc	= JFactory::getDocument();
+		$option = $app->input->get('option', null, 'cmd');
+		$view 	= $app->input->get('view', null, 'cmd');
+		$layout = $app->input->get('layout', null, 'cmd');
+		$id 	= $app->input->get('id', 0, 'int');
+		
 		if ($app->isAdmin() && $option == 'com_users' && $view == 'user' && $layout == 'edit') {
         
             $js = '<script type="text/javascript">
@@ -31,13 +32,12 @@ class plgSystemSimple_Switch_User extends JPlugin {
                 }
             }</script>';
             
-            $document =JFactory::getDocument();
-            $content = $document->getBuffer('component');
+            $content = $doc->getBuffer('component');
             $content = $content . $js;
-            $document->setBuffer($content, 'component');
+            $doc->setBuffer($content, 'component');
             
             JToolBarHelper::divider();
-            JToolBarHelper::custom('switchuser', 'preview', 'preview', 'Switch to User', false);
+            JToolBarHelper::custom('switchuser', 'lamp', 'lamp', 'Switch to User', false);
 		}
 	}
     
@@ -45,22 +45,21 @@ class plgSystemSimple_Switch_User extends JPlugin {
 		$app	= JFactory::getApplication();
 		$db		= JFactory::getDbo();
 		$user	= JFactory::getUser();
-		$userId = JRequest::getInt('uid', 0);
+		$userId = $app->input->get('uid', 0, 'int');
 		
-		if ($app->isAdmin() || !JRequest::getBool('switchuser', 0) || !$userId) {
+		if ($app->isAdmin() || !$app->input->get('switchuser', false, 'bool') || !$userId) {
 			return;
 		}
 		
 		if ($user->id == $userId) {
-			return $app->redirect('index.php', JText::_('You have already login as the user'));
+			return $app->redirect('index.php', JText::_('You have already login as the user'), 'warning');
 		}
 		
 		if ($user->id) {
-			JError::raiseWarning('SOME_ERROR_CODE', JText::_('You have login as another user, please logout first'));
-			return $app->redirect('index.php');
+			return $app->redirect('index.php', JText::_('You have login as another user, please logout first'), 'warning');
 		}
 		
-		$backendSessionId = JRequest::getVar(md5(JUtility::getHash('administrator')), null ,"COOKIE");
+		$backendSessionId = $app->input->cookie->get(md5(JApplication::getHash('administrator')));
 		$query = 'SELECT userid'
 			. ' FROM #__session'
 			. ' WHERE session_id = '.$db->Quote($backendSessionId)
@@ -71,60 +70,47 @@ class plgSystemSimple_Switch_User extends JPlugin {
 		$db->setQuery($query);
 		
 		if (!$db->loadResult()) {
-			JError::raiseWarning(500, JText::_('Back-end User Session Expired'));
-			return $app->redirect('index.php');
+			return $app->redirect('index.php', JText::_('Back-end User Session Expired'), 'error');
 		}
 		
 		$instance = JFactory::getUser($userId);
 
 		// If _getUser returned an error, then pass it back.
-		if (JError::isError($instance)) {
-			$app->redirect('index.php');
+		if ($instance instanceof Exception) {
+			$app->redirect('index.php', JText::_('User login failed'), 'error');
 			return;
 		}
 
 		// If the user is blocked, redirect with an error
 		if ($instance->get('block') == 1) {
-			JError::raiseWarning(500, JText::_('E_NOLOGIN_BLOCKED'));
-			$app->redirect('index.php');
+			$app->redirect('index.php', JText::_('JERROR_NOLOGIN_BLOCKED'), 'error');
 			return;
-		}
-
-		// Get an ACL object
-		$acl =JFactory::getACL();
-        
-		// Get the user group from the ACL
-		if ($instance->get('tmp_user') == 1) {
-			$grp = new JObject;
-			// This should be configurable at some point
-			$grp->set('name', 'Registered');
-		} else {
-			$grp = $acl->getGroupsByUser($instance->get('id'));
 		}
 
 		//Mark the user as logged in
 		$instance->set('guest', 0);
-		$instance->set('aid', 1);
 
 		//Set the usertype based on the ACL group name
 		$instance->set('usertype', $grp->name);
-
+		
 		// Register the needed session variables
 		$session = JFactory::getSession();
 		$session->set('user', $instance);
 
-		// Get the session object
-		$table = JTable::getInstance('session');
-		$table->load( $session->getId() );
+		// Check to see the the session already exists.
+		$app = JFactory::getApplication();
+		$app->checkSession();
 
-		$table->guest 		= $instance->get('guest');
-		$table->username 	= $instance->get('username');
-		$table->userid 		= intval($instance->get('id'));
-		$table->usertype 	= $instance->get('usertype');
-		$table->gid 		= intval($instance->get('gid'));
-
-		$table->update();
-
+		// Update the user related fields for the Joomla sessions table.
+		$query = $db->getQuery(true)
+			->update($db->quoteName('#__session'))
+			->set($db->quoteName('guest') . ' = ' . $db->quote($instance->get('guest')))
+			->set($db->quoteName('username') . ' = ' . $db->quote($instance->get('username')))
+			->set($db->quoteName('userid') . ' = ' . (int) $instance->get('id'))
+			->where($db->quoteName('session_id') . ' = ' . $db->quote($session->getId()));
+		$db->setQuery($query);
+		$db->execute();
+		
 		$app->redirect('index.php', JText::_('You have login successfully'));
 	}
 }
