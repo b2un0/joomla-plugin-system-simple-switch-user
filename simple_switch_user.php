@@ -41,7 +41,6 @@ class plgSystemSimple_Switch_User extends JPlugin {
 		}
 	}
     
-    
 	function onAfterInitialise() {
 		$app	= JFactory::getApplication();
 		$db		= JFactory::getDbo();
