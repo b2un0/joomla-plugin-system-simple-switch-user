@@ -37,7 +37,7 @@ class plgSystemSimple_Switch_User extends JPlugin {
             $doc->setBuffer($content, 'component');
             
             JToolBarHelper::divider();
-            JToolBarHelper::custom('switchuser', 'lamp', 'lamp', 'Switch to User', false);
+            JToolBarHelper::custom('switchuser', 'upload', 'upload', 'Switch to User', false);
 		}
 	}
     
