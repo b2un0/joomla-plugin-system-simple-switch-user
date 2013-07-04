@@ -59,13 +59,12 @@ class plgSystemSimple_Switch_User extends JPlugin {
 			return $app->redirect('index.php', JText::_('You have login as another user, please logout first'), 'warning');
 		}
 		
-		$backendSessionId = $app->input->cookie->get(md5(JApplication::getHash('administrator')));
-		$query = 'SELECT userid'
-			. ' FROM #__session'
-			. ' WHERE session_id = '.$db->Quote($backendSessionId)
-			. ' AND client_id = 1'
-			. ' AND guest = 0'
-		;
+		$query = $db->getQuery(true)
+				->select('userid')
+				->from('#__session')
+				->where('session_id = ' . $db->quote( $app->input->cookie->get(md5(JApplication::getHash('administrator')))) )
+				->where('client_id = 1')
+				->where('guest = 0');
 		
 		$db->setQuery($query);
 		
@@ -75,39 +74,32 @@ class plgSystemSimple_Switch_User extends JPlugin {
 		
 		$instance = JFactory::getUser($userId);
 
-		// If _getUser returned an error, then pass it back.
 		if ($instance instanceof Exception) {
 			$app->redirect('index.php', JText::_('User login failed'), 'error');
 			return;
 		}
 
-		// If the user is blocked, redirect with an error
 		if ($instance->get('block') == 1) {
 			$app->redirect('index.php', JText::_('JERROR_NOLOGIN_BLOCKED'), 'error');
 			return;
 		}
 
-		//Mark the user as logged in
 		$instance->set('guest', 0);
 
-		//Set the usertype based on the ACL group name
 		$instance->set('usertype', $grp->name);
 		
-		// Register the needed session variables
 		$session = JFactory::getSession();
 		$session->set('user', $instance);
 
-		// Check to see the the session already exists.
 		$app = JFactory::getApplication();
 		$app->checkSession();
 
-		// Update the user related fields for the Joomla sessions table.
 		$query = $db->getQuery(true)
-			->update($db->quoteName('#__session'))
-			->set($db->quoteName('guest') . ' = ' . $db->quote($instance->get('guest')))
-			->set($db->quoteName('username') . ' = ' . $db->quote($instance->get('username')))
-			->set($db->quoteName('userid') . ' = ' . (int) $instance->get('id'))
-			->where($db->quoteName('session_id') . ' = ' . $db->quote($session->getId()));
+				->update($db->quoteName('#__session'))
+				->set($db->quoteName('guest') . ' = ' . $db->quote($instance->get('guest')))
+				->set($db->quoteName('username') . ' = ' . $db->quote($instance->get('username')))
+				->set($db->quoteName('userid') . ' = ' . (int) $instance->get('id'))
+				->where($db->quoteName('session_id') . ' = ' . $db->quote($session->getId()));
 		$db->setQuery($query);
 		$db->execute();
 		
