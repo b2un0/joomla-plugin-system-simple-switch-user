@@ -11,7 +11,7 @@ defined('_JEXEC') or die;
 
 class plgSystemSimple_Switch_User extends JPlugin {
     
-	function onBeforeRender() {
+	public function onBeforeRender() {
 		$app 	= JFactory::getApplication();
 		$doc	= JFactory::getDocument();
 		$option = $app->input->get('option', null, 'cmd');
@@ -41,7 +41,7 @@ class plgSystemSimple_Switch_User extends JPlugin {
 		}
 	}
     
-	function onAfterInitialise() {
+	public function onAfterInitialise() {
 		$app	= JFactory::getApplication();
 		$db		= JFactory::getDbo();
 		$user	= JFactory::getUser();
@@ -75,13 +75,11 @@ class plgSystemSimple_Switch_User extends JPlugin {
 		$instance = JFactory::getUser($userId);
 
 		if ($instance instanceof Exception) {
-			$app->redirect('index.php', JText::_('User login failed'), 'error');
-			return;
+			return $app->redirect('index.php', JText::_('User login failed'), 'error');
 		}
 
 		if ($instance->get('block') == 1) {
-			$app->redirect('index.php', JText::_('JERROR_NOLOGIN_BLOCKED'), 'error');
-			return;
+			return $app->redirect('index.php', JText::_('JERROR_NOLOGIN_BLOCKED'), 'error');
 		}
 
 		$instance->set('guest', 0);

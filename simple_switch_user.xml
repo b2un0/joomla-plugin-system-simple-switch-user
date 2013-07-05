@@ -13,4 +13,7 @@
 		<filename plugin="simple_switch_user">simple_switch_user.php</filename>
 		<filename>index.html</filename>
 	</files>
+    <updateservers>
+		<server type="extension" priority="1" name="Simple Switch User">http://www.z-index.net/en/joomla/simple-switch-user/updatestream.xml</server>
+	</updateservers>
 </extension>
