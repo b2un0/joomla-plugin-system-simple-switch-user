@@ -19,7 +19,7 @@ class plgSystemSimple_Switch_User extends JPlugin {
 		$layout = $app->input->get('layout', null, 'cmd');
 		$id 	= $app->input->get('id', 0, 'int');
 		
-		if ($app->isAdmin() && $option == 'com_users' && $view == 'user' && $layout == 'edit') {
+		if ($app->isAdmin() && $option == 'com_users' && $view == 'user' && $layout == 'edit' && $id) {
 
 			$js = '<script type="text/javascript">
 			Joomla.submitbuttonOld = Joomla.submitbutton;
