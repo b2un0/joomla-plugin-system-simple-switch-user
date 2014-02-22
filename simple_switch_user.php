@@ -3,7 +3,7 @@
 /**
  * @author     Branko Wilhelm <branko.wilhelm@gmail.com>
  * @link       http://www.z-index.net
- * @copyright  (c) 2013 Branko Wilhelm
+ * @copyright  (c) 2013 - 2014 Branko Wilhelm
  * @license    GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -48,7 +48,7 @@ class plgSystemSimple_Switch_User extends JPlugin
         $app = JFactory::getApplication();
         $db = JFactory::getDbo();
         $user = JFactory::getUser();
-        $userId = $app->input->get('uid', 0, 'int');
+        $userId = $app->input->getInt('uid', 0, 'int');
 
         if ($app->isAdmin() || !$app->input->get('su', 0, 'int') || !$userId) {
             return;
