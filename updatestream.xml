@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<updates>
+    <update>
+        <name>System - Simple Switch User</name>
+        <element>simple_switch_user</element>
+        <type>plugin</type>
+        <client>0</client>
+        <folder>system</folder>
+        <version>1.0.0</version>
+        <infourl>https://github.com/z-index-net/joomla-plugin-system-simple-switch-user</infourl>
+        <downloads>
+            <downloadurl type="full" format="zip">https://github.com/z-index-net/joomla-plugin-system-simple-switch-user/releases/download/1.0.0/joomla-plugin-system-simple-switch-user.zip</downloadurl>
+        </downloads>
+        <targetplatform name="joomla" version="^3\."/>
+    </update>
+</updates>
+

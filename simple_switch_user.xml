@@ -13,6 +13,6 @@
         <filename plugin="simple_switch_user">simple_switch_user.php</filename>
     </files>
     <updateservers>
-        <server type="collection" priority="1" name="z-index development">http://www.z-index.net/en/extensions.xml</server>
+        <server type="extension" priority="1" name="System - Simple Switch User">https://raw.githubusercontent.com/z-index-net/joomla-plugin-system-simple-switch-user/master/updatestream.xml</server>
     </updateservers>
 </extension>
